@@ -9,6 +9,11 @@ A Remake of a ServerMod plugin where before the game starts, users can be tutori
 ### Note
 %player will return one of two options for messages ((0 or x players have connected) or (1 player has connected))
 
+### Credits
+- [F4Fridey](https://github.com/F4Fridey) (Original plugin idea from ServerMod)
+- [SirMeepington](https://github.com/sirmeepington) (Code for positioning TextHints vertically)
+- [RogerFK](https://github.com/RogerFK) (Code for replacing tokens (%player) with other values)
+
 ### Config
 ```yaml
 wait_and_chill:
@@ -25,13 +30,12 @@ wait_and_chill:
   # Determines the position of the Hint on the users screen (0 = Top, 32 = Close to Middle, Default 2)
   hint_vert_pos: 2
   # The top message that is displayed to users (Works with Unity Rich Text tags)
-  top_message: <color=yellow><b>The game will be starting soon, feel free to talk and shoot guns!</b></color>
+  top_message: <color=yellow><b>The game will be starting soon</b></color>
   # The bottom message that is displayed to users (Works with Unity Rich Text tags)
-  bottom_message: <i>%players and they are ready to play!</i>
+  bottom_message: <i>%players</i>
   # The list of items that will be given to users when they spawn (Case insensitive, use RoleType names)
   items_to_give:
   - GunUSP
-  - GunMP7
   - GunE11SR
   - GunLogicer
   # The amount of ammo for each AmmoType that will be given to users when they spawn (Default 100)
