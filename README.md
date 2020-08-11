@@ -33,7 +33,7 @@ wait_and_chill:
   top_message: <color=yellow><b>The game will be starting soon</b></color>
   # The bottom message that is displayed to users (Works with Unity Rich Text tags)
   bottom_message: <i>%players</i>
-  # The list of items that will be given to users when they spawn (Case insensitive, use RoleType names)
+  # The list of items that will be given to users when they spawn (Case insensitive, use ItemType names)
   items_to_give:
   - GunUSP
   - GunE11SR
