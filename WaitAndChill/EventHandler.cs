@@ -12,21 +12,21 @@ namespace WaitAndChill
 {
     public class EventHandler
     {
-        int PlayerCount = 0;
+        int PlayerCount;
+        RoleType RoleToSet;
         Plugin Plugin;
         CoroutineHandle Handle;
-        List<ItemType> ItemsToSpawn = new List<ItemType>();
+        System.Random RandNumGen = new System.Random();
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
 
         public void RunWhenPlayersWait()
         {
+            int RoleToChoose = RandNumGen.Next(0, Plugin.Config.RolesToChoose.Count);
+            PlayerCount = 0;
             Handle = Timing.RunCoroutine(BroadcastMessage());
             GameObject.Find("StartRound").transform.localScale = Vector3.zero;
-
-            foreach (string Item in Plugin.Config.ItemsToGive)
-                if (Enum.TryParse(Item, true, out ItemType Type))
-                    ItemsToSpawn.Add(Type);
+            RoleToSet = Plugin.Config.RolesToChoose[RoleToChoose];
         }
 
         public void RunWhenRoundStarts()
@@ -37,14 +37,14 @@ namespace WaitAndChill
         public void RunWhenRoundRestarts()
         {
             PlayerCount = 0;
-            ItemsToSpawn.Clear();
+            RoleToSet = RoleType.Tutorial;
         }
 
         public void RunWhenPlayerJoins(JoinedEventArgs JoinEv)
         {
             if (!Round.IsStarted)
             {
-                Timing.CallDelayed(0.25f, () => SetPlayer(JoinEv.Player));
+                Timing.CallDelayed(0.55f, () => SetPlayer(JoinEv.Player));
                 PlayerCount++;
             }
         }
@@ -57,10 +57,10 @@ namespace WaitAndChill
 
         public void SetPlayer(Player Ply)
         {
-            Ply.Role = RoleType.Tutorial;
+            Ply.Role = RoleToSet;
 
             if (Plugin.Config.GiveItems)
-                foreach (ItemType Item in ItemsToSpawn)
+                foreach (ItemType Item in Plugin.Config.ItemsToGive)
                     Ply.AddItem(Item);
 
             if (Plugin.Config.GiveAmmo)
@@ -91,8 +91,8 @@ namespace WaitAndChill
 
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
                     MessageBuilder = NorthwoodLib.Pools.StringBuilderPool.Shared.Rent();
-                    string TopMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result)});
-                    string BottomMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.BottomMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result)});
+                    string TopMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result) });
+                    string BottomMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.BottomMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result) });
 
                     MessageBuilder.AppendLine(TopMessage);
                     MessageBuilder.Append(BottomMessage);

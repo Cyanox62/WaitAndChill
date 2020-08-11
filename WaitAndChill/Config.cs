@@ -30,8 +30,11 @@ namespace WaitAndChill
         [Description("The bottom message that is displayed to users (Works with Unity Rich Text tags)")]
         public string BottomMessage { get; set; } = "<size=40><i>%players</i></size>";
 
-        [Description("The list of items that will be given to users when they spawn (Case insensitive, use RoleType names)")]
-        public List<string> ItemsToGive { get; private set; } = new List<string>() { "GunUSP", "GunE11SR", "GunLogicer" };
+        [Description("The list of roles that will be chosen to spawn as by random chance (Use RoleType names)")]
+        public List<RoleType> RolesToChoose { get; private set; } = new List<RoleType>() { RoleType.Tutorial };
+
+        [Description("The list of items that will be given to users when they spawn (Use ItemType names)")]
+        public List<ItemType> ItemsToGive { get; private set; } = new List<ItemType>() { ItemType.GunUSP, ItemType.GunE11SR, ItemType.GunLogicer };
 
         [Description("The amount of ammo for each AmmoType that will be given to users when they spawn (Default 100)")]
         public Dictionary<string, uint> AmmoToGive { get; private set; } = new Dictionary<string, uint>()
