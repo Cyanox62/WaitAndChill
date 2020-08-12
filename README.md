@@ -7,7 +7,8 @@ A Remake of a ServerMod plugin where before the game starts, users can be tutori
 - Choice of spawning items and/or ammo for users when they spawn in (Items can be entered in case insensitive!)
 
 ### Note
-%player will return one of two options for messages ((0 or x players have connected) or (1 player has connected))
+- %player will return one of two options for messages ((0 or x players have connected) or (1 player has connected))
+- %seconds will return one of four options for messages (The server is paused, The round has started, 1 second remains, x seconds remain)
 
 ### Credits
 - [F4Fridey](https://github.com/F4Fridey) (Original plugin idea from ServerMod)
