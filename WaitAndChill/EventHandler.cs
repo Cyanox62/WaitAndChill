@@ -57,7 +57,7 @@ namespace WaitAndChill
 
         public void RunWhenPlayerShoots(ShootingEventArgs ShootEv)
         {
-            if (Plugin.Config.GiveInfiniteAmmo)
+            if (!Round.IsStarted && Plugin.Config.GiveInfiniteAmmo)
                 ShootEv.Shooter.ReferenceHub.SetWeaponAmmo(999);
         }
 

@@ -19,10 +19,12 @@ namespace WaitAndChill
             RoundEvents.WaitingForPlayers += Handler.RunWhenPlayersWait;
             PlayerEvents.Joined += Handler.RunWhenPlayerJoins;
             PlayerEvents.Left += Handler.RunWhenPlayerLeaves;
+            PlayerEvents.Shooting += Handler.RunWhenPlayerShoots;
         }
 
         public override void OnDisabled()
         {
+            PlayerEvents.Shooting -= Handler.RunWhenPlayerShoots;
             PlayerEvents.Left -= Handler.RunWhenPlayerLeaves;
             PlayerEvents.Joined -= Handler.RunWhenPlayerJoins;
             RoundEvents.WaitingForPlayers -= Handler.RunWhenPlayersWait;
