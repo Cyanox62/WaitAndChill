@@ -44,7 +44,7 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted)
             {
-                Timing.CallDelayed(0.55f, () => SetPlayer(JoinEv.Player));
+                Timing.CallDelayed(1f, () => SetPlayer(JoinEv.Player));
                 PlayerCount++;
             }
         }
@@ -53,6 +53,12 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted && PlayerCount > 0)
                 PlayerCount--;
+        }
+
+        public void RunWhenPlayerShoots(ShootingEventArgs ShootEv)
+        {
+            if (Plugin.Config.GiveInfiniteAmmo)
+                ShootEv.Shooter.ReferenceHub.SetWeaponAmmo(999);
         }
 
         public void SetPlayer(Player Ply)
@@ -106,6 +112,8 @@ namespace WaitAndChill
                         default:
                             MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
                             MessageBuilder.Append(" seconds remain");
+                            if (GameCore.RoundStart.singleton.NetworkTimer == 0)
+                                CharacterClassManager.ForceRoundStart();
                             break;
                     }
                     string Time = MessageBuilder.ToString();

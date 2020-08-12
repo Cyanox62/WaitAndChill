@@ -27,6 +27,8 @@ wait_and_chill:
   give_items: true
   # Determines if ammo will be given to users when they spawn in
   give_ammo: true
+  # Determines if infinite ammo will be given to users when they spawn in
+  give_infinite_ammo: false
   # Determines the position of the Hint on the users screen (0 = Top, 32 = Close to Middle, Default 2)
   hint_vert_pos: 2
   # The top message that is displayed to users (Works with Unity Rich Text tags)

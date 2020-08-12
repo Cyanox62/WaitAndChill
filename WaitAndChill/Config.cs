@@ -21,6 +21,9 @@ namespace WaitAndChill
         [Description("Determines if ammo will be given to users when they spawn in")]
         public bool GiveAmmo { get; set; } = true;
 
+        [Description("Determines if infinite ammo will be given to users when they spawn in")]
+        public bool GiveInfiniteAmmo { get; set; } = false;
+
         [Description("Determines the position of the Hint on the users screen (0 = Top, 32 = Close to Middle, Default 2)")]
         public uint HintVertPos { get; set; } = 2;
 
