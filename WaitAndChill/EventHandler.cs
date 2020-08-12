@@ -88,11 +88,32 @@ namespace WaitAndChill
                     else
                         MessageBuilder.Append("player has connected");
                     string Result = MessageBuilder.ToString();
-
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
+
                     MessageBuilder = NorthwoodLib.Pools.StringBuilderPool.Shared.Rent();
-                    string TopMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result) });
-                    string BottomMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.BottomMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result) });
+                    switch (GameCore.RoundStart.singleton.NetworkTimer)
+                    {
+                        case -2:
+                            MessageBuilder.Append("The server is paused");
+                            break;
+                        case -1:
+                            MessageBuilder.Append("The round has started");
+                            break;
+                        case 1:
+                            MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
+                            MessageBuilder.Append(" second remains");
+                            break;
+                        default:
+                            MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
+                            MessageBuilder.Append(" seconds remain");
+                            break;
+                    }
+                    string Time = MessageBuilder.ToString();
+                    NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
+
+                    MessageBuilder = NorthwoodLib.Pools.StringBuilderPool.Shared.Rent();
+                    string TopMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result), new Tuple<string, object>("seconds", Time) });
+                    string BottomMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.BottomMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result), new Tuple<string, object>("seconds", Time) });
 
                     MessageBuilder.AppendLine(TopMessage);
                     MessageBuilder.Append(BottomMessage);

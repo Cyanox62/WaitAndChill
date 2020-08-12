@@ -25,7 +25,7 @@ namespace WaitAndChill
         public uint HintVertPos { get; set; } = 2;
 
         [Description("The top message that is displayed to users (Works with Unity Rich Text tags)")]
-        public string TopMessage { get; set; } = "<size=60><color=yellow><b>The game will be starting soon</b></color></size>";
+        public string TopMessage { get; set; } = "<size=50><color=yellow><b>The game will be starting soon, %seconds</b></color></size>";
 
         [Description("The bottom message that is displayed to users (Works with Unity Rich Text tags)")]
         public string BottomMessage { get; set; } = "<size=40><i>%players</i></size>";
