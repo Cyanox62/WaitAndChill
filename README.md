@@ -17,12 +17,12 @@ A Remake of a ServerMod plugin where before the game starts, users can be tutori
 ### Config
 ```yaml
 wait_and_chill:
-  # Determines whether this plugin will be enabled or not
+# Determines whether this plugin will be enabled or not
   is_enabled: true
   # Determines if any kind of message at all will be displayed
   display_wait_message: true
   # Determines if Broadcasts will be used for the message instead of Hints (WARNING: It can mess with any other broadcasts that are being done by other plugins)
-  use_broadcast_message: true
+  use_broadcast_message: false
   # Determines if items will be given to users when they spawn in
   give_items: true
   # Determines if ammo will be given to users when they spawn in
@@ -30,9 +30,9 @@ wait_and_chill:
   # Determines the position of the Hint on the users screen (0 = Top, 32 = Close to Middle, Default 2)
   hint_vert_pos: 2
   # The top message that is displayed to users (Works with Unity Rich Text tags)
-  top_message: <color=yellow><b>The game will be starting soon</b></color>
+  top_message: <size=50><color=yellow><b>The game will be starting soon, %seconds</b></color></size>
   # The bottom message that is displayed to users (Works with Unity Rich Text tags)
-  bottom_message: <i>%players</i>
+  bottom_message: <size=40><i>%players</i></size>
   # The list of roles that will be chosen to spawn as by random chance (Use RoleType names)
   roles_to_choose:
   - Tutorial
