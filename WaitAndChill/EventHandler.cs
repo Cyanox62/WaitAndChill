@@ -44,7 +44,7 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted)
             {
-                Timing.CallDelayed(1f, () => SetPlayer(JoinEv.Player));
+                Timing.CallDelayed(1f, () => JoinEv.Player.Role = RoleToSet);
                 PlayerCount++;
             }
         }
@@ -53,31 +53,6 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted && PlayerCount > 0)
                 PlayerCount--;
-        }
-
-        public void RunWhenPlayerShoots(ShootingEventArgs ShootEv)
-        {
-            if (!Round.IsStarted && Plugin.Config.GiveInfiniteAmmo)
-                ShootEv.Shooter.ReferenceHub.SetWeaponAmmo(999);
-        }
-
-        public void SetPlayer(Player Ply)
-        {
-            Ply.Role = RoleToSet;
-
-            if (Plugin.Config.GiveItems)
-                foreach (ItemType Item in Plugin.Config.ItemsToGive)
-                    Ply.AddItem(Item);
-
-            if (Plugin.Config.GiveAmmo)
-                SetPlayerAmmo(Ply);
-        }
-
-        public void SetPlayerAmmo(Player Ply)
-        {
-            Ply.SetAmmo(AmmoType.Nato556, Ply.GetAmmo(AmmoType.Nato556) + Plugin.Config.AmmoToGive["Nato556Ammo"]);
-            Ply.SetAmmo(AmmoType.Nato762, Ply.GetAmmo(AmmoType.Nato762) + Plugin.Config.AmmoToGive["Nato762Ammo"]);
-            Ply.SetAmmo(AmmoType.Nato9, Ply.GetAmmo(AmmoType.Nato9) + Plugin.Config.AmmoToGive["Nato9Ammo"]);
         }
 
         public IEnumerator<float> BroadcastMessage()
@@ -137,7 +112,6 @@ namespace WaitAndChill
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
                     yield return Timing.WaitForSeconds(1f);
                 }
-                Map.ClearBroadcasts();
             }
         }
 
