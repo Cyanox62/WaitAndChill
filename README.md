@@ -24,12 +24,6 @@ wait_and_chill:
   display_wait_message: true
   # Determines if Broadcasts will be used for the message instead of Hints (WARNING: It can mess with any other broadcasts that are being done by other plugins)
   use_broadcast_message: false
-  # Determines if items will be given to users when they spawn in
-  give_items: true
-  # Determines if ammo will be given to users when they spawn in
-  give_ammo: true
-  # Determines if infinite ammo will be given to users when they spawn in
-  give_infinite_ammo: false
   # Determines the position of the Hint on the users screen (0 = Top, 32 = Close to Middle, Default 2)
   hint_vert_pos: 2
   # The top message that is displayed to users (Works with Unity Rich Text tags)
@@ -39,14 +33,14 @@ wait_and_chill:
   # The list of roles that will be chosen to spawn as by random chance (Use RoleType names)
   roles_to_choose:
   - Tutorial
-  # The list of items that will be given to users when they spawn (Use ItemType names)
-  items_to_give:
-  - GunUSP
-  - GunE11SR
-  - GunLogicer
-  # The amount of ammo for each AmmoType that will be given to users when they spawn (Default 100)
-  ammo_to_give:
-    Nato556Ammo: 100
-    Nato762Ammo: 100
-    Nato9Ammo: 100
+  # Customization for the player and timer text, works with Unity Rich Text tags
+  custom_text_values:
+    Timer:
+      XSecondsRemain: seconds remain
+      1SecondRemains: second remains
+      ServerIsPaused: The server is paused
+      RoundStarting: The round has started
+    Player:
+      XPlayersConnected: players have connected
+      1PlayerConnected: player has connected
 ```

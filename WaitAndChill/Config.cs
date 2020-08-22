@@ -26,5 +26,26 @@ namespace WaitAndChill
 
         [Description("The list of roles that will be chosen to spawn as by random chance (Use RoleType names)")]
         public List<RoleType> RolesToChoose { get; private set; } = new List<RoleType>() { RoleType.Tutorial };
+
+        [Description("Customization for the player and timer text, works with Unity Rich Text tags")]
+        public Dictionary<string, Dictionary<string, string>> CustomTextValues { get; private set; } = new Dictionary<string, Dictionary<string, string>>()
+        {
+            { 
+                "Timer", new Dictionary<string, string>()
+                {
+                    { "XSecondsRemain", "seconds remain" },
+                    { "1SecondRemains", "second remains" },
+                    { "ServerIsPaused", "The server is paused" },
+                    { "RoundStarting", "The round has started" }
+                }
+            },
+            {
+                "Player", new Dictionary<string, string>()
+                {
+                    { "XPlayersConnected", "players have connected" },
+                    { "1PlayerConnected", "player has connected" }
+                }
+            },
+        };
     }
 }

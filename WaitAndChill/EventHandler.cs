@@ -42,7 +42,7 @@ namespace WaitAndChill
 
         public void RunWhenPlayerJoins(JoinedEventArgs JoinEv)
         {
-            if (!Round.IsStarted)
+            if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2))
             {
                 Timing.CallDelayed(1f, () => JoinEv.Player.Role = RoleToSet);
                 PlayerCount++;
@@ -65,9 +65,9 @@ namespace WaitAndChill
                     MessageBuilder.Append(PlayerCount);
                     MessageBuilder.Append(" ");
                     if (PlayerCount != 1)
-                        MessageBuilder.Append("players have connected");
+                        MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Player", out Dictionary<string, string> Diction1) ? (Diction1.TryGetValue("XPlayersConnected", out string value) ? value : "") : "");
                     else
-                        MessageBuilder.Append("player has connected");
+                        MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Player", out Dictionary<string, string> Diction1) ? (Diction1.TryGetValue("1PlayerConnected", out string value) ? value : "") : "");
                     string Result = MessageBuilder.ToString();
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
 
@@ -75,18 +75,20 @@ namespace WaitAndChill
                     switch (GameCore.RoundStart.singleton.NetworkTimer)
                     {
                         case -2:
-                            MessageBuilder.Append("The server is paused");
+                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction1) ? (Diction1.TryGetValue("ServerIsPaused", out string value1) ? value1 : "") : "");
                             break;
                         case -1:
-                            MessageBuilder.Append("The round has started");
+                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction2) ? (Diction2.TryGetValue("RoundStarting", out string value2) ? value2 : "") : "");
                             break;
                         case 1:
                             MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
-                            MessageBuilder.Append(" second remains");
+                            MessageBuilder.Append(" ");
+                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction3) ? (Diction3.TryGetValue("1SecondRemains", out string value3) ? value3 : "") : "");
                             break;
                         default:
                             MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
-                            MessageBuilder.Append(" seconds remain");
+                            MessageBuilder.Append(" ");
+                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction4) ? (Diction4.TryGetValue("XSecondsRemain", out string value4) ? value4 : "") : "");
                             if (GameCore.RoundStart.singleton.NetworkTimer == 0)
                                 CharacterClassManager.ForceRoundStart();
                             break;
