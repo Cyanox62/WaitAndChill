@@ -26,6 +26,7 @@ namespace WaitAndChill
             PlayerEvents.Left += Handler.RunWhenPlayerLeaves;
             PlayerEvents.Spawning += Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker += Handler.RunWhenLockerOpens;
+            PlayerEvents.PickingUpItem += Handler.RunWhenPickingUpItem;
         }
 
         public override void OnDisabled()
@@ -39,6 +40,7 @@ namespace WaitAndChill
             RoundEvents.RestartingRound -= Handler.RunWhenRoundRestarts;
             PlayerEvents.Spawning -= Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker -= Handler.RunWhenLockerOpens;
+            PlayerEvents.PickingUpItem -= Handler.RunWhenPickingUpItem;
             Handler = null;
         }
 
