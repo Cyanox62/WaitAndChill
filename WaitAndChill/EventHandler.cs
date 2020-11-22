@@ -1,5 +1,6 @@
 ﻿using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Extensions;
 using Exiled.Events.EventArgs;
 using Hints;
 using MEC;
@@ -17,6 +18,9 @@ namespace WaitAndChill
         Plugin Plugin;
         CoroutineHandle Handle;
         System.Random RandNumGen = new System.Random();
+        Vector3 GateA;
+        Lift lift;
+        WorkStation workstation;
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
 
@@ -27,11 +31,43 @@ namespace WaitAndChill
             Handle = Timing.RunCoroutine(BroadcastMessage());
             GameObject.Find("StartRound").transform.localScale = Vector3.zero;
             RoleToSet = Plugin.Config.RolesToChoose[RoleToChoose];
+            foreach (Room room in Map.Rooms)
+            {
+                if (room.Name == "EZ_GateA")
+                {
+                    GateA = room.Position;
+                    GateA.y += 2;
+                }
+            }
+            foreach (Lift lift in Map.Lifts)
+            {
+                if (lift.elevatorName == "GateA")
+                {
+                    this.lift = lift;
+                }
+            }
+            int dist = int.MaxValue;
+            foreach (WorkStation ws in GameObject.FindObjectsOfType<WorkStation>())
+            {
+                int calc = (int)Vector3.Distance(GateA, ws.transform.position);
+                if (calc < dist)
+                {
+                    dist = calc;
+                    workstation = ws;
+                }
+            }
+            lift.Network_locked = true;
+            lift.NetworkstatusID = (byte)Lift.Status.Down;
+            workstation.NetworkisTabletConnected = true;
         }
 
         public void RunWhenRoundStarts()
         {
-            Timing.KillCoroutines(Handle);
+            Timing.KillCoroutines(new CoroutineHandle[] { Handle });
+
+            lift.Network_locked = false;
+            lift.NetworkstatusID = (byte)Lift.Status.Up;
+            workstation.NetworkisTabletConnected = false;
         }
 
         public void RunWhenRoundRestarts()
@@ -55,6 +91,14 @@ namespace WaitAndChill
                 PlayerCount--;
         }
 
+        public void RunWhenPlayerSpawns(SpawningEventArgs SpawnEv)
+        {
+            if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2) && SpawnEv.RoleType == RoleType.Tutorial)
+            {
+                SpawnEv.Position = GateA;
+            }
+        }
+
         public IEnumerator<float> BroadcastMessage()
         {
             if (Plugin.Config.DisplayWaitMessage)
@@ -72,32 +116,46 @@ namespace WaitAndChill
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
 
                     MessageBuilder = NorthwoodLib.Pools.StringBuilderPool.Shared.Rent();
+                    string msg = "<size=50><color=yellow><b>";
                     switch (GameCore.RoundStart.singleton.NetworkTimer)
                     {
                         case -2:
-                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction1) ? (Diction1.TryGetValue("ServerIsPaused", out string value1) ? value1 : "") : "");
+                            //MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction1) ? (Diction1.TryGetValue("ServerIsPaused", out string value1) ? value1 : "") : "");
+                            if (GameCore.RoundStart.LobbyLock)
+                            {
+                                msg += "the round is paused";
+                            }
+                            else
+                            {
+                                msg += "waiting for players";
+                            }
                             break;
                         case -1:
-                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction2) ? (Diction2.TryGetValue("RoundStarting", out string value2) ? value2 : "") : "");
+                        case 0:
+                            //MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction2) ? (Diction2.TryGetValue("RoundStarting", out string value2) ? value2 : "") : "");
+                            msg += "the round is starting";
                             break;
                         case 1:
-                            MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
-                            MessageBuilder.Append(" ");
-                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction3) ? (Diction3.TryGetValue("1SecondRemains", out string value3) ? value3 : "") : "");
+                            //MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
+                            //MessageBuilder.Append(" ");
+                            // MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction3) ? (Diction3.TryGetValue("1SecondRemains", out string value3) ? value3 : "") : "");
+                            msg += "the round will start in 1 second";
                             break;
                         default:
-                            MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
-                            MessageBuilder.Append(" ");
-                            MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction4) ? (Diction4.TryGetValue("XSecondsRemain", out string value4) ? value4 : "") : "");
+                            //MessageBuilder.Append(GameCore.RoundStart.singleton.NetworkTimer);
+                            //MessageBuilder.Append(" ");
+                            //MessageBuilder.Append(Plugin.Config.CustomTextValues.TryGetValue("Timer", out Dictionary<string, string> Diction4) ? (Diction4.TryGetValue("XSecondsRemain", out string value4) ? value4 : "") : "");
+                            msg += $"the round will start in {GameCore.RoundStart.singleton.NetworkTimer} seconds";
                             if (GameCore.RoundStart.singleton.NetworkTimer == 0)
                                 CharacterClassManager.ForceRoundStart();
                             break;
                     }
+                    msg += "</b></color></size>";
                     string Time = MessageBuilder.ToString();
                     NorthwoodLib.Pools.StringBuilderPool.Shared.Return(MessageBuilder);
 
                     MessageBuilder = NorthwoodLib.Pools.StringBuilderPool.Shared.Rent();
-                    string TopMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result), new Tuple<string, object>("seconds", Time) });
+                    string TopMessage = msg; //TokenReplacer.ReplaceAfterToken(Plugin.Config.TopMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result), new Tuple<string, object>("seconds", Time) });
                     string BottomMessage = TokenReplacer.ReplaceAfterToken(Plugin.Config.BottomMessage, '%', new Tuple<string, object>[] { new Tuple<string, object>("players", Result), new Tuple<string, object>("seconds", Time) });
 
                     MessageBuilder.AppendLine(TopMessage);
