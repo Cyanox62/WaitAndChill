@@ -12,18 +12,11 @@ namespace WaitAndChill
         public override string Author => "KoukoCocoa";
         public override string Name => "WaitAndChill";
 
-        private int Patches = 0;
-
-        private Harmony hInstance;
-
         public override void OnEnabled()
         {
             base.OnEnabled();
 
             if (!Config.IsEnabled) return;
-
-            hInstance = new Harmony($"koukococoa.waitandchill-{++Patches}");
-            hInstance.PatchAll();
 
             Handler = new EventHandler(this);
             RoundEvents.RestartingRound += Handler.RunWhenRoundRestarts;
@@ -32,6 +25,7 @@ namespace WaitAndChill
             PlayerEvents.Joined += Handler.RunWhenPlayerJoins;
             PlayerEvents.Left += Handler.RunWhenPlayerLeaves;
             PlayerEvents.Spawning += Handler.RunWhenPlayerSpawns;
+            PlayerEvents.InteractingLocker += Handler.RunWhenLockerOpens;
         }
 
         public override void OnDisabled()
@@ -44,10 +38,8 @@ namespace WaitAndChill
             RoundEvents.RoundStarted -= Handler.RunWhenRoundStarts;
             RoundEvents.RestartingRound -= Handler.RunWhenRoundRestarts;
             PlayerEvents.Spawning -= Handler.RunWhenPlayerSpawns;
+            PlayerEvents.InteractingLocker -= Handler.RunWhenLockerOpens;
             Handler = null;
-
-            hInstance.UnpatchAll();
-            hInstance = null;
         }
 
         public override void OnReloaded() { }
