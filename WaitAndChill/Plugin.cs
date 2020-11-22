@@ -12,6 +12,8 @@ namespace WaitAndChill
         public override string Author => "KoukoCocoa";
         public override string Name => "WaitAndChill";
 
+        private int Patches = 0;
+
         private Harmony hInstance;
 
         public override void OnEnabled()
@@ -20,7 +22,7 @@ namespace WaitAndChill
 
             if (!Config.IsEnabled) return;
 
-            hInstance = new Harmony("koukococoa.waitandchill");
+            hInstance = new Harmony($"koukococoa.waitandchill-{++Patches}");
             hInstance.PatchAll();
 
             Handler = new EventHandler(this);
