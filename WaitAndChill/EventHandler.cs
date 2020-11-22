@@ -64,16 +64,7 @@ namespace WaitAndChill
                     break;
                 case RoomType.Hcz106:
                     Room = Map.Rooms.First(r => r.Type == type);
-                    GameObject cube = Physics.OverlapSphere(Room.Position, 20f).First(c => c.name == "Cube")?.gameObject;
-                    if (cube != null)
-                    {
-                        RoomPosition = cube.transform.position;
-                    }
-                    else
-                    {
-                        Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
-                        RoomPosition = Room.Position;
-                    }
+                    RoomPosition = RoleType.Scp106.GetRandomSpawnPoint();
                     break;
                 case RoomType.Lcz173:
                     Room = Map.Rooms.First(r => r.Type == type);
