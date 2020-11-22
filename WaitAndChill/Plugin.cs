@@ -2,6 +2,7 @@
 using HarmonyLib;
 using PlayerEvents = Exiled.Events.Handlers.Player;
 using RoundEvents = Exiled.Events.Handlers.Server;
+using Scp914Events = Exiled.Events.Handlers.Scp914;
 
 
 namespace WaitAndChill
@@ -27,6 +28,8 @@ namespace WaitAndChill
             PlayerEvents.Spawning += Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker += Handler.RunWhenLockerOpens;
             PlayerEvents.PickingUpItem += Handler.RunWhenPickingUpItem;
+            Scp914Events.Activating += Handler.RunWhenActivating914;
+            Scp914Events.ChangingKnobSetting += Handler.RunWhenChanging914KnobState;
         }
 
         public override void OnDisabled()
@@ -41,6 +44,8 @@ namespace WaitAndChill
             PlayerEvents.Spawning -= Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker -= Handler.RunWhenLockerOpens;
             PlayerEvents.PickingUpItem -= Handler.RunWhenPickingUpItem;
+            Scp914Events.Activating -= Handler.RunWhenActivating914;
+            Scp914Events.ChangingKnobSetting -= Handler.RunWhenChanging914KnobState;
             Handler = null;
         }
 

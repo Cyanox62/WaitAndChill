@@ -24,7 +24,13 @@ namespace WaitAndChill
         Lift GateALift;
         Lift GateBLift;
 
-        RoomType[] PossibleRooms = { RoomType.EzGateA, RoomType.EzGateB, RoomType.Hcz939, RoomType.Surface, RoomType.Hcz106, RoomType.Lcz173, RoomType.LczGlassBox, RoomType.Lcz012 };
+        RoomType[] PossibleRooms = 
+        { 
+            RoomType.EzGateA, RoomType.EzGateB, RoomType.Hcz939, RoomType.Surface, 
+            RoomType.Hcz106, RoomType.Lcz173, RoomType.LczGlassBox, RoomType.Lcz012, 
+            RoomType.Lcz914, RoomType.LczArmory, RoomType.HczServers, RoomType.EzDownstairsPcs, 
+            RoomType.EzUpstairsPcs, RoomType.EzShelter
+        };
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
 
@@ -38,42 +44,58 @@ namespace WaitAndChill
 
             RoomType type = PossibleRooms[RandNumGen.Next(PossibleRooms.Length)];
 
-            switch (type)
+            try
+            {
+                switch (type)
+                {
+                    case RoomType.EzGateA:
+                    case RoomType.EzGateB:
+                    case RoomType.Hcz939:
+                    case RoomType.LczGlassBox:
+                    case RoomType.Lcz012:
+                    case RoomType.Lcz914:
+                    case RoomType.LczArmory:
+                    case RoomType.HczServers:
+                    case RoomType.EzDownstairsPcs:
+                    case RoomType.EzUpstairsPcs:
+                    case RoomType.EzShelter:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = Room.Position;
+                        if (type == RoomType.Lcz012)
+                        {
+                            RoomPosition.y -= 6;
+                        }
+                        break;
+                    case RoomType.Surface:
+                        if (RandNumGen.Next(2) == 0)
+                        {
+                            RoomPosition = new Vector3(53, 1019, -44);
+                        }
+                        else
+                        {
+                            RoomPosition = new Vector3(-22, 1019, -44);
+                        }
+                        break;
+                    case RoomType.Hcz106:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = RoleType.Scp106.GetRandomSpawnPoint();
+                        break;
+                    case RoomType.Lcz173:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = RoleType.Scp173.GetRandomSpawnPoint();
+                        break;
+                    default:
+                        Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                        RoomPosition = Room.Position;
+                        break;
+                }
+            }
+            catch(Exception e)
 			{
-                case RoomType.EzGateA:
-                case RoomType.EzGateB:
-                case RoomType.Hcz939:
-                case RoomType.LczGlassBox:
-                case RoomType.Lcz012:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = Room.Position;
-                    if (type == RoomType.Lcz012)
-					{
-                        RoomPosition.y -= 6;
-					}
-                    break;
-                case RoomType.Surface:
-                    if (RandNumGen.Next(2) == 0)
-                    {
-                        RoomPosition = new Vector3(53, 1019, -44);
-                    }
-                    else
-                    {
-                        RoomPosition = new Vector3(-22, 1019, -44);
-                    }
-                    break;
-                case RoomType.Hcz106:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = RoleType.Scp106.GetRandomSpawnPoint();
-                    break;
-                case RoomType.Lcz173:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = RoleType.Scp173.GetRandomSpawnPoint();
-                    break;
-                default:
-                    Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
-                    RoomPosition = Room.Position;
-                    break;
+                Log.Error($"Wait and Chill positional error: {e}");
+                type = RoomType.EzGateA;
+                Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                RoomPosition = Room.Position;
             }
 
             if (Room != null && type != RoomType.LczGlassBox)
@@ -114,6 +136,22 @@ namespace WaitAndChill
         }
 
         public void RunWhenPickingUpItem(PickingUpItemEventArgs ev)
+        {
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
+        public void RunWhenChanging914KnobState (ChangingKnobSettingEventArgs ev)
+		{
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
+        public void RunWhenActivating914(ActivatingEventArgs ev)
         {
             if (!Round.IsStarted)
             {
