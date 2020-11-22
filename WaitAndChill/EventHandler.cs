@@ -6,6 +6,7 @@ using Hints;
 using MEC;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -18,9 +19,12 @@ namespace WaitAndChill
         Plugin Plugin;
         CoroutineHandle Handle;
         System.Random RandNumGen = new System.Random();
-        Vector3 GateA;
-        Lift lift;
-        WorkStation workstation;
+        Vector3 RoomPosition;
+        Room Room;
+        Lift GateALift;
+        Lift GateBLift;
+
+        RoomType[] PossibleRooms = { RoomType.EzGateA, RoomType.EzGateB, RoomType.Hcz939, RoomType.Surface, RoomType.Hcz106, RoomType.Lcz173, RoomType.LczGlassBox, RoomType.Lcz012 };
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
 
@@ -31,43 +35,98 @@ namespace WaitAndChill
             Handle = Timing.RunCoroutine(BroadcastMessage());
             GameObject.Find("StartRound").transform.localScale = Vector3.zero;
             RoleToSet = Plugin.Config.RolesToChoose[RoleToChoose];
-            foreach (Room room in Map.Rooms)
-            {
-                if (room.Name == "EZ_GateA")
-                {
-                    GateA = room.Position;
-                    GateA.y += 2;
-                }
+
+            RoomType type = PossibleRooms[RandNumGen.Next(PossibleRooms.Length)];
+
+            switch (type)
+			{
+                case RoomType.EzGateA:
+                case RoomType.EzGateB:
+                case RoomType.Hcz939:
+                case RoomType.LczGlassBox:
+                case RoomType.Lcz012:
+                    Room = Map.Rooms.First(r => r.Type == type);
+                    RoomPosition = Room.Position;
+                    if (type == RoomType.Lcz012)
+					{
+                        RoomPosition.y -= 6;
+					}
+                    break;
+                case RoomType.Surface:
+                    if (RandNumGen.Next(2) == 0)
+                    {
+                        RoomPosition = new Vector3(53, 1019, -44);
+                    }
+                    else
+                    {
+                        RoomPosition = new Vector3(-22, 1019, -44);
+                    }
+                    break;
+                case RoomType.Hcz106:
+                    Room = Map.Rooms.First(r => r.Type == type);
+                    GameObject cube = Physics.OverlapSphere(Room.Position, 20f).First(c => c.name == "Cube")?.gameObject;
+                    if (cube != null)
+                    {
+                        RoomPosition = cube.transform.position;
+                    }
+                    else
+                    {
+                        Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                        RoomPosition = Room.Position;
+                    }
+                    break;
+                case RoomType.Lcz173:
+                    Room = Map.Rooms.First(r => r.Type == type);
+                    RoomPosition = RoleType.Scp173.GetRandomSpawnPoint();
+                    break;
+                default:
+                    Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                    RoomPosition = Room.Position;
+                    break;
             }
+
+            if (Room != null && type != RoomType.LczGlassBox)
+            {
+                foreach (Door door in Room.Doors) door.Networklocked = true;
+            }
+            else if(type == RoomType.LczGlassBox)
+			{
+                Room.Doors.First(d => d.doorType == Door.DoorTypes.HeavyGate).Networklocked = true;
+			}
+
+            RoomPosition.y += 2;
+
             foreach (Lift lift in Map.Lifts)
             {
                 if (lift.elevatorName == "GateA")
                 {
-                    this.lift = lift;
+                    GateALift = lift;
                 }
+                else if (lift.elevatorName == "GateB")
+				{
+                    GateBLift = lift;
+				}
             }
-            int dist = int.MaxValue;
-            foreach (WorkStation ws in GameObject.FindObjectsOfType<WorkStation>())
-            {
-                int calc = (int)Vector3.Distance(GateA, ws.transform.position);
-                if (calc < dist)
-                {
-                    dist = calc;
-                    workstation = ws;
-                }
-            }
-            lift.Network_locked = true;
-            lift.NetworkstatusID = (byte)Lift.Status.Down;
-            workstation.NetworkisTabletConnected = true;
+
+            GateALift.Network_locked = true;
+            GateALift.NetworkstatusID = (byte)Lift.Status.Down;
+            GateBLift.Network_locked = true;
+            GateBLift.NetworkstatusID = (byte)Lift.Status.Down;
         }
 
         public void RunWhenRoundStarts()
         {
             Timing.KillCoroutines(new CoroutineHandle[] { Handle });
 
-            lift.Network_locked = false;
-            lift.NetworkstatusID = (byte)Lift.Status.Up;
-            workstation.NetworkisTabletConnected = false;
+            GateALift.Network_locked = false;
+            GateALift.NetworkstatusID = (byte)Lift.Status.Up;
+            GateBLift.Network_locked = false;
+            GateBLift.NetworkstatusID = (byte)Lift.Status.Up;
+
+            if (Room != null)
+            {
+                foreach (Door door in Room.Doors) door.Networklocked = false;
+            }
         }
 
         public void RunWhenRoundRestarts()
@@ -95,7 +154,7 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2) && SpawnEv.RoleType == RoleType.Tutorial)
             {
-                SpawnEv.Position = GateA;
+                SpawnEv.Position = RoomPosition;
             }
         }
 
