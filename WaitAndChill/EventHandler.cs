@@ -105,8 +105,21 @@ namespace WaitAndChill
             GateBLift.NetworkstatusID = (byte)Lift.Status.Down;
         }
 
-        public void RunWhenLockerOpens(InteractingLockerEventArgs ev) => ev.IsAllowed = Round.IsStarted;
-        public void RunWhenPickingUpItem(PickingUpItemEventArgs ev) => ev.IsAllowed = Round.IsStarted;
+        public void RunWhenLockerOpens(InteractingLockerEventArgs ev)
+        {
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
+        public void RunWhenPickingUpItem(PickingUpItemEventArgs ev)
+        {
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
 
         public void RunWhenRoundStarts()
         {
