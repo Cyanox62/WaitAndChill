@@ -24,9 +24,40 @@ namespace WaitAndChill
         Lift GateALift;
         Lift GateBLift;
 
-        RoomType[] PossibleRooms = { RoomType.EzGateA, RoomType.EzGateB, RoomType.Hcz939, RoomType.Surface, RoomType.Hcz106, RoomType.Lcz173, RoomType.LczGlassBox, RoomType.Lcz012 };
+        Dictionary<RoomType, float> PossibleRooms = new Dictionary<RoomType, float>
+        {
+            { RoomType.EzShelter, 1 },
+            { RoomType.EzGateA, 5},
+            { RoomType.EzGateB, 5 },
+            { RoomType.Hcz939, 5 },
+            { RoomType.Surface, 5 },
+            { RoomType.Hcz106, 5 },
+            { RoomType.Lcz173, 5 },
+            { RoomType.LczGlassBox, 5 },
+            { RoomType.Lcz012, 5 },
+            { RoomType.Lcz914, 5 },
+            { RoomType.LczArmory, 5 },
+            { RoomType.HczServers, 5 },
+            { RoomType.EzDownstairsPcs, 5 },
+            { RoomType.EzUpstairsPcs, 5 }
+        };
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
+
+        public void Init()
+		{
+            float totalChance = 0;
+            float sum = 0;
+            Dictionary<RoomType, float> copy = new Dictionary<RoomType, float>();
+            foreach (float chance in PossibleRooms.Values) totalChance += chance;
+            foreach (KeyValuePair<RoomType, float> room in PossibleRooms)
+			{
+                sum += room.Value;
+                copy.Add(room.Key, 100 * (sum / totalChance));
+			}
+
+            PossibleRooms = copy;
+		}
 
         public void RunWhenPlayersWait()
         {
@@ -36,44 +67,69 @@ namespace WaitAndChill
             GameObject.Find("StartRound").transform.localScale = Vector3.zero;
             RoleToSet = Plugin.Config.RolesToChoose[RoleToChoose];
 
-            RoomType type = PossibleRooms[RandNumGen.Next(PossibleRooms.Length)];
-
-            switch (type)
+            RoomType type = RoomType.EzGateA;
+            double rng = RandNumGen.NextDouble() * 100;
+            foreach (KeyValuePair<RoomType, float> room in PossibleRooms)
 			{
-                case RoomType.EzGateA:
-                case RoomType.EzGateB:
-                case RoomType.Hcz939:
-                case RoomType.LczGlassBox:
-                case RoomType.Lcz012:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = Room.Position;
-                    if (type == RoomType.Lcz012)
-					{
-                        RoomPosition.y -= 6;
-					}
+                if (rng < room.Value)
+				{
+                    type = room.Key;
                     break;
-                case RoomType.Surface:
-                    if (RandNumGen.Next(2) == 0)
-                    {
-                        RoomPosition = new Vector3(53, 1019, -44);
-                    }
-                    else
-                    {
-                        RoomPosition = new Vector3(-22, 1019, -44);
-                    }
-                    break;
-                case RoomType.Hcz106:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = RoleType.Scp106.GetRandomSpawnPoint();
-                    break;
-                case RoomType.Lcz173:
-                    Room = Map.Rooms.First(r => r.Type == type);
-                    RoomPosition = RoleType.Scp173.GetRandomSpawnPoint();
-                    break;
-                default:
-                    Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
-                    RoomPosition = Room.Position;
-                    break;
+				}
+			}
+
+            try
+            {
+                switch (type)
+                {
+                    case RoomType.EzGateA:
+                    case RoomType.EzGateB:
+                    case RoomType.Hcz939:
+                    case RoomType.LczGlassBox:
+                    case RoomType.Lcz012:
+                    case RoomType.Lcz914:
+                    case RoomType.LczArmory:
+                    case RoomType.HczServers:
+                    case RoomType.EzDownstairsPcs:
+                    case RoomType.EzUpstairsPcs:
+                    case RoomType.EzShelter:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = Room.Position;
+                        if (type == RoomType.Lcz012)
+                        {
+                            RoomPosition.y -= 6;
+                        }
+                        break;
+                    case RoomType.Surface:
+                        if (RandNumGen.Next(2) == 0)
+                        {
+                            RoomPosition = new Vector3(53, 1019, -44);
+                        }
+                        else
+                        {
+                            RoomPosition = new Vector3(-22, 1019, -44);
+                        }
+                        break;
+                    case RoomType.Hcz106:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = RoleType.Scp106.GetRandomSpawnPoint();
+                        break;
+                    case RoomType.Lcz173:
+                        Room = Map.Rooms.First(r => r.Type == type);
+                        RoomPosition = RoleType.Scp173.GetRandomSpawnPoint();
+                        break;
+                    default:
+                        Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                        RoomPosition = Room.Position;
+                        break;
+                }
+            }
+            catch(Exception e)
+			{
+                Log.Error($"Wait and Chill positional error: {e}");
+                type = RoomType.EzGateA;
+                Room = Map.Rooms.First(r => r.Type == RoomType.EzGateA);
+                RoomPosition = Room.Position;
             }
 
             if (Room != null && type != RoomType.LczGlassBox)
@@ -121,6 +177,22 @@ namespace WaitAndChill
             }
         }
 
+        public void RunWhenChanging914KnobState (ChangingKnobSettingEventArgs ev)
+		{
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
+        public void RunWhenActivating914(ActivatingEventArgs ev)
+        {
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
         public void RunWhenRoundStarts()
         {
             Timing.KillCoroutines(new CoroutineHandle[] { Handle });
@@ -133,6 +205,10 @@ namespace WaitAndChill
             if (Room != null)
             {
                 foreach (Door door in Room.Doors) door.Networklocked = false;
+                if (Room.Type == RoomType.Lcz012)
+                {
+                    RoomPosition.y -= 6;
+                }
             }
         }
 
