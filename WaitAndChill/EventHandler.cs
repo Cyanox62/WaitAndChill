@@ -24,15 +24,40 @@ namespace WaitAndChill
         Lift GateALift;
         Lift GateBLift;
 
-        RoomType[] PossibleRooms = 
-        { 
-            RoomType.EzGateA, RoomType.EzGateB, RoomType.Hcz939, RoomType.Surface, 
-            RoomType.Hcz106, RoomType.Lcz173, RoomType.LczGlassBox, RoomType.Lcz012, 
-            RoomType.Lcz914, RoomType.LczArmory, RoomType.HczServers, RoomType.EzDownstairsPcs, 
-            RoomType.EzUpstairsPcs, RoomType.EzShelter
+        Dictionary<RoomType, float> PossibleRooms = new Dictionary<RoomType, float>
+        {
+            { RoomType.EzShelter, 1 },
+            { RoomType.EzGateA, 5},
+            { RoomType.EzGateB, 5 },
+            { RoomType.Hcz939, 5 },
+            { RoomType.Surface, 5 },
+            { RoomType.Hcz106, 5 },
+            { RoomType.Lcz173, 5 },
+            { RoomType.LczGlassBox, 5 },
+            { RoomType.Lcz012, 5 },
+            { RoomType.Lcz914, 5 },
+            { RoomType.LczArmory, 5 },
+            { RoomType.HczServers, 5 },
+            { RoomType.EzDownstairsPcs, 5 },
+            { RoomType.EzUpstairsPcs, 5 }
         };
 
         public EventHandler(Plugin Plugin) => this.Plugin = Plugin;
+
+        public void Init()
+		{
+            float totalChance = 0;
+            float sum = 0;
+            Dictionary<RoomType, float> copy = new Dictionary<RoomType, float>();
+            foreach (float chance in PossibleRooms.Values) totalChance += chance;
+            foreach (KeyValuePair<RoomType, float> room in PossibleRooms)
+			{
+                sum += room.Value;
+                copy.Add(room.Key, 100 * (sum / totalChance));
+			}
+
+            PossibleRooms = copy;
+		}
 
         public void RunWhenPlayersWait()
         {
@@ -42,7 +67,16 @@ namespace WaitAndChill
             GameObject.Find("StartRound").transform.localScale = Vector3.zero;
             RoleToSet = Plugin.Config.RolesToChoose[RoleToChoose];
 
-            RoomType type = PossibleRooms[RandNumGen.Next(PossibleRooms.Length)];
+            RoomType type = RoomType.EzGateA;
+            double rng = RandNumGen.NextDouble() * 100;
+            foreach (KeyValuePair<RoomType, float> room in PossibleRooms)
+			{
+                if (rng < room.Value)
+				{
+                    type = room.Key;
+                    break;
+				}
+			}
 
             try
             {
@@ -171,6 +205,10 @@ namespace WaitAndChill
             if (Room != null)
             {
                 foreach (Door door in Room.Doors) door.Networklocked = false;
+                if (Room.Type == RoomType.Lcz012)
+                {
+                    RoomPosition.y -= 6;
+                }
             }
         }
 

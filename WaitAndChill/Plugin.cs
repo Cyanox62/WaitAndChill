@@ -20,6 +20,7 @@ namespace WaitAndChill
             if (!Config.IsEnabled) return;
 
             Handler = new EventHandler(this);
+            Handler.Init();
             RoundEvents.RestartingRound += Handler.RunWhenRoundRestarts;
             RoundEvents.RoundStarted += Handler.RunWhenRoundStarts;
             RoundEvents.WaitingForPlayers += Handler.RunWhenPlayersWait;
