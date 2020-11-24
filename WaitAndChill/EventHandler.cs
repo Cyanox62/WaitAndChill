@@ -169,6 +169,14 @@ namespace WaitAndChill
             }
         }
 
+        public void RunWhenPlayerHurt(HurtingEventArgs ev)
+        {
+            if (!Round.IsStarted && ev.DamageType == DamageTypes.Falldown)
+            {
+                ev.Amount = 0f;
+            }
+        }
+
         public void RunWhenPickingUpItem(PickingUpItemEventArgs ev)
         {
             if (!Round.IsStarted)

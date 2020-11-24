@@ -29,6 +29,7 @@ namespace WaitAndChill
             PlayerEvents.Spawning += Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker += Handler.RunWhenLockerOpens;
             PlayerEvents.PickingUpItem += Handler.RunWhenPickingUpItem;
+            PlayerEvents.Hurting += Handler.RunWhenPlayerHurt;
             Scp914Events.Activating += Handler.RunWhenActivating914;
             Scp914Events.ChangingKnobSetting += Handler.RunWhenChanging914KnobState;
         }
@@ -45,6 +46,7 @@ namespace WaitAndChill
             PlayerEvents.Spawning -= Handler.RunWhenPlayerSpawns;
             PlayerEvents.InteractingLocker -= Handler.RunWhenLockerOpens;
             PlayerEvents.PickingUpItem -= Handler.RunWhenPickingUpItem;
+            PlayerEvents.Hurting -= Handler.RunWhenPlayerHurt;
             Scp914Events.Activating -= Handler.RunWhenActivating914;
             Scp914Events.ChangingKnobSetting -= Handler.RunWhenChanging914KnobState;
             Handler = null;
