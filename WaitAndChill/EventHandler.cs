@@ -169,14 +169,6 @@ namespace WaitAndChill
             }
         }
 
-        public void RunWhenPlayerHurt(HurtingEventArgs ev)
-        {
-            if (!Round.IsStarted && ev.DamageType == DamageTypes.Falldown)
-            {
-                ev.Amount = 0f;
-            }
-        }
-
         public void RunWhenPickingUpItem(PickingUpItemEventArgs ev)
         {
             if (!Round.IsStarted)
@@ -210,6 +202,8 @@ namespace WaitAndChill
             GateBLift.Network_locked = false;
             GateBLift.NetworkstatusID = (byte)Lift.Status.Up;
 
+            foreach (Player p in Player.List) p.IsGodModeEnabled = false;
+
             if (Room != null)
             {
                 foreach (Door door in Room.Doors) door.Networklocked = false;
@@ -230,7 +224,10 @@ namespace WaitAndChill
         {
             if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2))
             {
-                Timing.CallDelayed(1f, () => JoinEv.Player.Role = RoleToSet);
+                Timing.CallDelayed(1f, () => {
+                    JoinEv.Player.Role = RoleToSet;
+                    JoinEv.Player.IsGodModeEnabled = true;
+                });
                 PlayerCount++;
             }
         }
