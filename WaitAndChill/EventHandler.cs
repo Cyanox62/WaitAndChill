@@ -222,14 +222,14 @@ namespace WaitAndChill
 
         public void RunWhenPlayerJoins(JoinedEventArgs JoinEv)
         {
-            if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2))
-            {
-                Timing.CallDelayed(1f, () => {
+            Timing.CallDelayed(1f, () => {
+                if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2))
+                {
                     JoinEv.Player.Role = RoleToSet;
                     JoinEv.Player.IsGodModeEnabled = true;
-                });
-                PlayerCount++;
-            }
+                    PlayerCount++;
+                }
+            });
         }
 
         public void RunWhenPlayerLeaves(LeftEventArgs LeftEv)
