@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace WaitAndChill
 {
-    public static class Extensions
-    {
-        public static void SetWeaponAmmo(this ReferenceHub Rh, int Amount)
-        {
-            Rh.inventory.items.ModifyDuration(
-            Rh.inventory.items.IndexOf(Rh.inventory.GetItemInHand()),
-            Amount);
-        }
-    }
+	public static class Extensions
+	{
+		public static void SetWeaponAmmo(this ReferenceHub Rh, int Amount)
+		{
+			Rh.inventory.items.ModifyDuration(
+			Rh.inventory.items.IndexOf(Rh.inventory.GetItemInHand()),
+			Amount);
+		}
+	}
 }
