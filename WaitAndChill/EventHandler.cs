@@ -204,8 +204,6 @@ namespace WaitAndChill
 
 		public void RunWhenRoundStarts()
 		{
-			Log.Info(GateALift);
-			Log.Info(GateBLift);
 			Timing.KillCoroutines(new CoroutineHandle[] { Handle });
 
 			GateALift.Network_locked = false;
